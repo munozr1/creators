@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+#root {
+  text-align: center;
+  /* o/verflow: hidden; */
+
+}
+
+:root {
+  --neutral-900: 0 0% 7%;
+  --border: hsl(var(--neutral-900)/9%);
+}
+
+.grid-bg-left {
+  background-image: url('https://nominal.io/img/grid-left-mobile.webp');
+  display: block;
+  height: 591px;
+  width: 140px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+@media (min-width: 640px) {
+  .grid-bg-left {
+    background-image: url('https://nominal.io/img/grid-left-tablet.webp');
+    top: -64px;
+    height: 728px;
+    width: 324px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .grid-bg-left {
+    background-image: url('https://nominal.io/img/grid-left.webp');
+    height: 960px;
+    width: 431px;
+  }
+}
+
+
+.grid-bg-right {
+  background-image: url('https://nominal.io/img/grid-right-mobile.webp');
+  display: block;
+  height: 591px;
+  width: 140px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+@media (min-width: 640px) {
+  .grid-bg-right {
+    background-image: url('https://nominal.io/img/grid-right-tablet.webp');
+    top: -64px;
+    height: 728px;
+    width: 324px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .grid-bg-right {
+    background-image: url('https://nominal.io/img/grid-right.webp');
+    height: 960px;
+    width: 431px;
+  }
+}
+
+.main-content {
+  position: absolute;
+  width: 25vw;
+  height: 50vh;
+}
+
+.hero-section {
+  position: relative;
+  width: calc(100vw - 100px);
+  left: 50px;
+  /* border: 1px solid red; */
+  background-color: transparent;
+  height: 50vh;
+}
+
+/* modify the header */
+header {
+  max-width: 1056px;
+  height: 60px;
+  background-color: #fcfcfc;
+  display: block;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 50;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  border: 1px solid var(--border);
+  padding: 0 20px;
+}
+
+
+.navbar-item{
+display: flex;
+gap: 32px;
+padding: 6px 12px;
+font-size: 1rem;
+font-weight: 500;
+text-transform: lowercase;
+line-height: 1rem;
+letter-spacing: .05em;
+opacity: 0.5;
+}
+.corner-frame {
+  position: relative;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  color: #000;
+  background-color: #f4f4f4;
+  border: none;
+  cursor: pointer;
+  z-index: 0;
+}
+
+.frame {
+  color: black;
+  background-color: #f4f4f4;
+}
+
+.corner-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    linear-gradient(to right, black 7px, transparent 0) top left,
+    linear-gradient(to right, black 7px, transparent 0) bottom left,
+    linear-gradient(to left, black 7px, transparent 0) top right,
+    linear-gradient(to left, black 7px, transparent 0) bottom right,
+    linear-gradient(to bottom, black 7px, transparent 0) top left,
+    linear-gradient(to bottom, black 7px, transparent 0) top right,
+    linear-gradient(to top, black 7px, transparent 0) bottom left,
+    linear-gradient(to top, black 7px, transparent 0) bottom right;
+  background-repeat: no-repeat;
+  background-size: 10px 2px, 10px 2px, 10px 2px, 10px 2px,
+                   2px 10px, 2px 10px, 2px 10px, 2px 10px;
+}
+
+.corner-frame:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+
+.faded-sides {
+  position: relative;
+  background: white;
+  overflow: hidden;
+}
+
+/* .faded-sides::before, */
+.faded-sides::after {
+  content: '';
+  /* position: absolute; */
+  top: 0;
+  width: 100px; /* how wide the fade effect is */
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.faded-sides::before {
+  left: 0;
+  background: linear-gradient(to right, #d1d1d1 0%, transparent 100%);
+}
+
+.faded-sides::after {
+  right: 0;
+  background: linear-gradient(to left, #d1d1d1 0%, transparent 100%);
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  padding: 60px;
+}
+
+
+body {
+  font-family: monospace;
+  margin: 0;
+  background: white;
+}
+
+.top-section {
+  background: #f4f4f4;
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  font-size: 1.1rem;
+}
+
+.highlight {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.stats-container {
+  display: flex;
+  justify-content: space-between;
+  /* gap: 20px; */
+  margin-bottom: 40px 0;
+  border: 1px solid #ccc;
+}
+
+.stat-box {
+  border: 1px solid #eee;
+  padding: 30px 40px;
+  text-align: center;
+  width: 180px;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #2d2d2d;
+}
+
+.stat-label {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #555;
+  letter-spacing: 1px;
+}
