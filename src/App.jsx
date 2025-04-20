@@ -118,17 +118,15 @@ function App() {
         <div className="grid-bg-left "></div>
         <div className="grid-bg-right "></div>
         <section className=" hero-section fade-sides">
-          <div className=" content flex flexcol items-center w-full h-full justify-center">
-            <div className="flex flex-col itemscenter w-[33rem]">
+          <div className=" content flex flex-col sm:flex-row items-center w-full h-full justify-center">
+            <div className="flex flex-col items-center w-[33rem]">
               <p className="mt-2 max-w-lg text-pretty text-4xl font-semibold tracking-tight mb-6 text-gray-950 sm:text-5xl">
                 the BEST creator analytics platform
               </p>
               <p className="text-gray-400 text-left">
                 CreatorQ users are 10x more likely to grow their audience by
-                making data-driven decisions Nominal powers mission-critical
-                engineering work with modern analysis tools, real-time
-                observability, and advanced data infrastructure — all in one
-                collaborative workspace.
+                making data-driven decisions. Use our platform to track your
+                audience growth, engagement, and more.
               </p>
               <button className="corner-frame w-36 mt-6">try now</button>
             </div>
@@ -140,7 +138,7 @@ function App() {
           </div>
 
           <Bento />
-          <div className="top-section mt-10">
+          <div className="top-section mt-10 max-w-2xl mx-auto lg:max-w-7xl">
             Trusted by the world's fastest growing
             <span className="highlight mr-1 ml-1" ref={animationRef}>
                 {dynamicText}
@@ -149,7 +147,7 @@ function App() {
             content creators
           </div>
 
-          <div className="stats-container">
+          <div className="max-w-2xl mx-auto lg:max-w-7xl stats-container flex flex-col sm:flex-row">
             <div className="border-1 border-[#ccc] w-full flex justify-center py-5">
               <div className="stat-box">
                 <div className="stat-value">65700</div>
@@ -159,7 +157,7 @@ function App() {
             <div className="border-1 border-[#ccc] w-full flex justify-center py-5">
               <div className="stat-box">
                 <div className="stat-value">21B</div>
-                <div className="stat-label">VIEW</div>
+                <div className="stat-label">VIEWS</div>
               </div>
             </div>
             <div className="border-1 border-[#ccc] w-full flex justify-center py-5">
