@@ -23,7 +23,7 @@
 
 @media (min-width: 640px) {
   .grid-bg-left {
-    background-image: url('https://nominal.io/img/grid-left-tablet.webp');
+    background-image: url('/grid-left-tablet.webp');
     top: -64px;
     height: 728px;
     width: 324px;
@@ -32,7 +32,7 @@
 
 @media (min-width: 1280px) {
   .grid-bg-left {
-    background-image: url('https://nominal.io/img/grid-left.webp');
+    background-image: url('/grid-left.webp');
     height: 960px;
     width: 431px;
   }
@@ -40,7 +40,7 @@
 
 
 .grid-bg-right {
-  background-image: url('https://nominal.io/img/grid-right-mobile.webp');
+  background-image: url('/grid-right-mobile.webp');
   display: block;
   height: 591px;
   width: 140px;
@@ -51,7 +51,7 @@
 
 @media (min-width: 640px) {
   .grid-bg-right {
-    background-image: url('https://nominal.io/img/grid-right-tablet.webp');
+    background-image: url('/grid-right-tablet.webp');
     top: -64px;
     height: 728px;
     width: 324px;
@@ -60,7 +60,7 @@
 
 @media (min-width: 1280px) {
   .grid-bg-right {
-    background-image: url('https://nominal.io/img/grid-right.webp');
+    background-image: url('/grid-right.webp');
     height: 960px;
     width: 431px;
   }
