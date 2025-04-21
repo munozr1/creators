@@ -6,8 +6,18 @@ import LegalPage from './components/LegalPage';
 import { QRCodeSVG } from 'qrcode.react'; // Import the named export
 
 // Backend configuration
-const BACKEND_URL = "https://api.codemeet.dev";
-const WEBSOCKET_URL = 'wss://api.codemeet.dev';
+// Automatically switch between development and production URLs
+const isDevelopment = import.meta.env.DEV;
+const BACKEND_URL = isDevelopment 
+  ? "http://localhost:3001" 
+  : "https://api.codemeet.dev";
+const WEBSOCKET_URL = isDevelopment 
+  ? "ws://localhost:3001" 
+  : "wss://api.codemeet.dev";
+
+console.log(`Running in ${isDevelopment ? 'development' : 'production'} mode`);
+console.log(`Backend URL: ${BACKEND_URL}`);
+console.log(`WebSocket URL: ${WEBSOCKET_URL}`);
 
 function App() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
