@@ -18,7 +18,7 @@ export default function TopVideos({ authToken }) {
         setLoading(true);
         
         // Using TikTok API directly as specified in the documentation
-        const response = await fetch(`${TIKTOK_API_URL}?fields=id,title,cover_image_url,statistics,create_time`, {
+        const response = await fetch(`${TIKTOK_API_URL}?fields=id,title,cover_image_url,create_time`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
