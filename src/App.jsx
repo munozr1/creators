@@ -3,7 +3,7 @@ import Bento from './components/bento';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import LegalPage from './components/LegalPage';
-import * as QRCode from 'qrcode.react'; // Import QRCode
+import { QRCodeSVG } from 'qrcode.react'; // Import the named export
 
 // Backend configuration
 const BACKEND_URL = 'http://localhost:3001';
@@ -24,7 +24,6 @@ function App() {
   const [authToken, setAuthToken] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const wsRef = useRef(null);
-  const tikTokTokenRef = useRef(null);
   
   const words = ['gaming', 'makeup', 'fashion', 'irl', 'news'];
   const typingSpeed = 150;
@@ -128,74 +127,96 @@ function App() {
       return;
     }
     
-    wsRef.current = new WebSocket(WEBSOCKET_URL);
-    
-    wsRef.current.onopen = () => {
-      wsRef.current.send(JSON.stringify({ type: 'register', token }));
-    };
-    
-    wsRef.current.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        
-        if (message.type === 'error') {
-          setLoginStatus('error');
-          setErrorMessage(message.message);
-          wsRef.current?.close();
-          return;
-        }
-        
-        if (message.type === 'registered') {
-          setLoginStatus('pending_scan');
-          return;
-        }
-        
-        if (message.type === 'status_update') {
-          switch (message.status) {
-            case 'pending':
-            case 'generated':
-              if (loginStatus !== 'scanned') setLoginStatus('pending_scan');
-              break;
-            case 'scanned':
-              setLoginStatus('scanned');
-              break;
-            case 'confirmed':
-              setLoginStatus('confirmed');
-              setAuthToken(message.code);
-              setShowQrCode(false);
-              wsRef.current?.close();
-              break;
-            case 'expired':
-              setLoginStatus('expired');
-              setErrorMessage('QR code expired.');
-              wsRef.current?.close();
-              break;
-            case 'utilised':
-              setLoginStatus('error');
-              setErrorMessage('Session already used.');
-              wsRef.current?.close();
-              break;
-            default:
-              break;
+    try {
+      wsRef.current = new WebSocket(WEBSOCKET_URL);
+      
+      // Add event handlers before sending any messages
+      wsRef.current.onopen = () => {
+        console.log("WebSocket connection opened");
+        // Make sure to send the register message only after connection is fully established
+        setTimeout(() => {
+          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({ type: 'register', token }));
+            console.log("Registration message sent");
           }
+        }, 500);
+      };
+      
+      wsRef.current.onmessage = (event) => {
+        try {
+          console.log("WebSocket message received:", event.data);
+          const message = JSON.parse(event.data);
+          
+          if (message.type === 'error') {
+            setLoginStatus('error');
+            setErrorMessage(message.message || 'Unknown error');
+            return;
+          }
+          
+          if (message.type === 'registered') {
+            console.log("Successfully registered with the WebSocket server");
+            setLoginStatus('pending_scan');
+            return;
+          }
+          
+          if (message.type === 'status_update') {
+            console.log("Status update received:", message.status);
+            switch (message.status) {
+              case 'pending':
+              case 'generated':
+              case 'new':
+                if (loginStatus !== 'scanned') setLoginStatus('pending_scan');
+                break;
+              case 'scanned':
+                setLoginStatus('scanned');
+                break;
+              case 'confirmed':
+                setLoginStatus('confirmed');
+                setAuthToken(message.code);
+                setShowQrCode(false);
+                break;
+              case 'expired':
+                setLoginStatus('expired');
+                setErrorMessage('QR code expired.');
+                break;
+              case 'utilised':
+                setLoginStatus('error');
+                setErrorMessage('Session already used.');
+                break;
+              default:
+                console.log("Unknown status:", message.status);
+                break;
+            }
+          }
+        } catch (err) {
+          console.error("Error handling WebSocket message:", err);
+          setLoginStatus('error');
+          setErrorMessage('Server message error.');
         }
-      } catch {
+      };
+      
+      wsRef.current.onerror = (event) => {
+        console.error("WebSocket error:", event);
         setLoginStatus('error');
-        setErrorMessage('Server message error.');
-        wsRef.current?.close();
-      }
-    };
-    
-    wsRef.current.onerror = () => {
+        setErrorMessage('WebSocket connection error.');
+      };
+      
+      wsRef.current.onclose = (event) => {
+        console.log("WebSocket connection closed:", event.code, event.reason);
+        wsRef.current = null;
+        
+        // If not already in a final state, indicate the connection was lost
+        if (!['confirmed', 'error', 'expired'].includes(loginStatus)) {
+          setLoginStatus('error');
+          setErrorMessage('Connection to server was lost.');
+        }
+      };
+    } catch (err) {
+      console.error("Error setting up WebSocket:", err);
       setLoginStatus('error');
-      setErrorMessage('WebSocket connection error.');
-      if (wsRef.current) wsRef.current.close();
-    };
-    
-    wsRef.current.onclose = () => {
-      wsRef.current = null;
-    };
-  }, [loginStatus]);
+      setErrorMessage('Failed to connect to server.');
+    }
+  }, [loginStatus, setLoginStatus, setErrorMessage, setAuthToken, setShowQrCode]);
 
   // QR Code Fetch Logic
   const handleLoginClick = async () => {
@@ -209,25 +230,40 @@ function App() {
     setErrorMessage('');
     setAuthToken(null);
     setQrCodeUrl('');
-    tikTokTokenRef.current = null;
+    
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
     
     try {
+      console.log("Fetching QR code");
       const response = await fetch(`${BACKEND_URL}/get-qr-code`, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
-      const data = await response.json();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Server responded with status: ${response.status}`);
+      }
       
-      if (!response.ok || data.error || !data.scan_qrcode_url || !data.token) {
-        throw new Error(data.error_description || data.message || 'Failed to fetch QR code.');
+      const data = await response.json();
+      console.log("QR code fetched successfully");
+      
+      if (!data.scan_qrcode_url || !data.token) {
+        throw new Error('Invalid response from server');
       }
       
       setQrCodeUrl(data.scan_qrcode_url);
-      tikTokTokenRef.current = data.token;
+      console.log("Setting up WebSocket with token");
       setupWebSocket(data.token);
     } catch (error) {
+      console.error("Error fetching QR code:", error);
       setLoginStatus('error');
-      setErrorMessage(error.message);
+      setErrorMessage(error.message || 'Failed to fetch QR code');
       setShowQrCode(false);
     }
   };
@@ -342,7 +378,7 @@ function HomeContent({
                 <div className="flex flex-col items-center justify-center text-center p-4 border border-gray-300 rounded bg-white h-full w-full">
                   {loginStatus === 'pending_qr' && <p className="text-gray-500 animate-pulse">Loading QR Code...</p>}
                   {qrCodeUrl && ['pending_scan', 'scanned', 'expired'].includes(loginStatus) && (
-                    <QRCode value={qrCodeUrl} size={220} level="M" />
+                    <QRCodeSVG value={qrCodeUrl} size={220} level="M" />
                   )}
                   <div className="mt-auto pt-2">
                     {loginStatus === 'pending_scan' && <p className="text-blue-600 text-sm font-medium">Scan with TikTok app</p>}
