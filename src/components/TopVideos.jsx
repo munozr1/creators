@@ -5,10 +5,7 @@ export default function TopVideos({ authToken }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Define API URL based on environment
-  const BACKEND_URL = import.meta.env.DEV 
-    ? "http://localhost:3001" 
-    : "https://api.codemeet.dev";
+  const TIKTOK_API_URL = 'https://open.tiktokapis.com/v2/video/list/';
   
   useEffect(() => {
     async function fetchVideos() {
@@ -20,28 +17,52 @@ export default function TopVideos({ authToken }) {
       try {
         setLoading(true);
         
-        const response = await fetch(`${BACKEND_URL}/user/videos`, {
-          method: 'GET',
+        // Using TikTok API directly as specified in the documentation
+        const response = await fetch(`${TIKTOK_API_URL}?fields=id,title,cover_image_url,statistics,create_time`, {
+          method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
-          }
+          },
+          body: JSON.stringify({
+            max_count: 3 // Limit to 3 videos
+          })
         });
         
         if (!response.ok) {
-          throw new Error(`Failed to fetch videos: ${response.status}`);
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || `Failed to fetch videos: ${response.status}`);
         }
         
         const data = await response.json();
-        setVideos(data.videos?.slice(0, 3) || []);
+        
+        if (data.error && data.error.code !== 'ok') {
+          throw new Error(`TikTok API error: ${data.error.message || data.error.code}`);
+        }
+        
+        // Transform the TikTok API response to our expected format
+        const transformedVideos = data.data?.videos?.map(video => ({
+          id: video.id,
+          title: video.title || 'Untitled Video',
+          cover: video.cover_image_url,
+          stats: {
+            views: video.statistics?.view_count || 0,
+            likes: video.statistics?.like_count || 0,
+            comments: video.statistics?.comment_count || 0,
+            shares: video.statistics?.share_count || 0
+          },
+          create_time: video.create_time
+        })) || [];
+        
+        setVideos(transformedVideos);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching videos:", err);
         setError(err.message);
         setLoading(false);
         
-        // Use sample data for development/demo
-        if (import.meta.env.DEV) {
+        // Use sample data 
+        if (!authToken) {
           setVideos([
             {
               id: 'v1',
@@ -70,7 +91,7 @@ export default function TopVideos({ authToken }) {
     }
     
     fetchVideos();
-  }, [authToken, BACKEND_URL]);
+  }, [authToken]);
   
   // Helper function to format numbers
   const formatNumber = (num) => {

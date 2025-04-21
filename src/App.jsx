@@ -27,7 +27,7 @@ function App() {
   const [isInView, setIsInView] = useState(false);
   const animationRef = useRef(null);
   const timeoutRef = useRef(null); // Ref to hold the timeout ID
-  
+
   // TikTok auth state
   const [showQrCode, setShowQrCode] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
@@ -35,12 +35,12 @@ function App() {
   const [authToken, setAuthToken] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const wsRef = useRef(null);
-  
+
   const words = ['gaming', 'makeup', 'fashion', 'irl', 'news'];
   const typingSpeed = 150;
   const deletingSpeed = 100;
   const pauseBeforeDelete = 2300;
-  
+
   // State and logic for the "spacecraft" typing animation
   const [dynamicText, setDynamicText] = useState('');
   
@@ -52,7 +52,7 @@ function App() {
       { threshold: 0.1 }
     );
 
-    const currentRef = animationRef.current;
+      const currentRef = animationRef.current;
     if (currentRef) {
       observer.observe(currentRef);
     }
@@ -63,52 +63,75 @@ function App() {
       }
     };
   }, []);
-  
+
   useEffect(() => {
-    let blinkCursor;
-    if (isInView) {
+      let blinkCursor;
+      if (isInView) {
       blinkCursor = setInterval(() => {
         setCursorVisible(prev => !prev);
       }, 500);
-    } else {
-      setCursorVisible(false);
-    }
+      } else {
+          setCursorVisible(false);
+      }
     
-    return () => clearInterval(blinkCursor);
+      return () => clearInterval(blinkCursor);
   }, [isInView]);
-  
+
+  const exchangeCodeForToken = async (code) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/exchange-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to exchange code for token');
+      }
+
+      const data = await response.json();
+      setAuthToken(data.access_token);
+      console.log('Access token:', data.access_token);
+    } catch (error) {
+      console.error('Error exchanging code for token:', error);
+      setErrorMessage('Failed to exchange code for token.');
+    }
+  };
+
   useEffect(() => {
     // Always clear previous timeout on effect run if it exists
-    if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-    }
+      if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+      }
 
     if (!isInView) {
       return; // No cleanup needed here as timeout is cleared above
     }
 
-    const currentWord = words[currentWordIndex];
+      const currentWord = words[currentWordIndex];
 
-    if (isDeleting) {
+      if (isDeleting) {
       // --- Deletion Logic ---
-      if (dynamicText === '') {
-        setIsDeleting(false);
-        setCurrentWordIndex((prev) => (prev + 1) % words.length);
+          if (dynamicText === '') {
+              setIsDeleting(false);
+              setCurrentWordIndex((prev) => (prev + 1) % words.length);
         // No timeout needed, state change triggers next cycle
-      } else {
+          } else {
         timeoutRef.current = setTimeout(() => {
           setDynamicText(prev => prev.slice(0, -1));
         }, deletingSpeed);
-      }
-    } else {
+          }
+      } else {
       // --- Typing Logic ---
-      if (dynamicText === currentWord) {
+          if (dynamicText === currentWord) {
         // Schedule timeout ONLY to trigger deletion state change after pause
         timeoutRef.current = setTimeout(() => {
            setIsDeleting(true); // Set isDeleting=true *after* the pause completes
         }, pauseBeforeDelete);
-      } else {
+          } else {
         // Schedule timeout to type next character
         timeoutRef.current = setTimeout(() => {
           setDynamicText(currentWord.slice(0, dynamicText.length + 1));
@@ -154,9 +177,9 @@ function App() {
       };
       
       wsRef.current.onmessage = (event) => {
-        try {
+          try {
           console.log("WebSocket message received:", event.data);
-          const message = JSON.parse(event.data);
+              const message = JSON.parse(event.data);
           
           if (message.type === 'error') {
             setLoginStatus('error');
@@ -170,9 +193,9 @@ function App() {
             return;
           }
           
-          if (message.type === 'status_update') {
+              if (message.type === 'status_update') {
             console.log("Status update received:", message.status);
-            switch (message.status) {
+                  switch (message.status) {
               case 'pending':
               case 'generated':
               case 'new':
@@ -185,6 +208,8 @@ function App() {
                 setLoginStatus('confirmed');
                 setAuthToken(message.code);
                 setShowQrCode(false);
+                //exchange code for access token
+                exchangeCodeForToken(message.code);
                 break;
               case 'expired':
                 setLoginStatus('expired');
@@ -236,8 +261,8 @@ function App() {
       return;
     }
     
-    setShowQrCode(true);
-    setLoginStatus('pending_qr');
+      setShowQrCode(true);
+      setLoginStatus('pending_qr');
     setErrorMessage('');
     setAuthToken(null);
     setQrCodeUrl('');
@@ -261,17 +286,17 @@ function App() {
         throw new Error(errorData.message || `Server responded with status: ${response.status}`);
       }
       
-      const data = await response.json();
+          const data = await response.json();
       console.log("QR code fetched successfully");
       
       if (!data.scan_qrcode_url || !data.token) {
         throw new Error('Invalid response from server');
       }
       
-      setQrCodeUrl(data.scan_qrcode_url);
+          setQrCodeUrl(data.scan_qrcode_url);
       console.log("Setting up WebSocket with token");
-      setupWebSocket(data.token);
-    } catch (error) {
+          setupWebSocket(data.token);
+      } catch (error) {
       console.error("Error fetching QR code:", error);
       setLoginStatus('error');
       setErrorMessage(error.message || 'Failed to fetch QR code');
@@ -287,7 +312,7 @@ function App() {
       }
     };
   }, []);
-  
+
   const isLoginPending = ['pending_qr', 'pending_scan', 'scanned'].includes(loginStatus);
 
   return (

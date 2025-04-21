@@ -5,6 +5,7 @@ import TopVideos from './TopVideos';
 function Dashboard({ authToken }) {
   // Use authToken to potentially display user info
   const truncatedToken = authToken ? `${authToken.substring(0, 8)}...` : '';
+  console.log('Dashboard => Auth token:', authToken);
   
   return (
     <div className="flex flex-col min-h-screen">
