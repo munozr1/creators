@@ -61,32 +61,30 @@ export default function TopVideos({ authToken }) {
         setError(err.message);
         setLoading(false);
         
-        // Use sample data 
-        if (!authToken) {
-          setVideos([
-            {
-              id: 'v1',
-              title: 'TikTok Dance Challenge',
-              cover: 'https://placehold.co/300x500/333/FFF?text=Dance',
-              stats: { views: 158000, likes: 12300, comments: 840, shares: 320 },
-              create_time: '2023-11-15T14:32:00Z'
-            },
-            {
-              id: 'v2',
-              title: 'Morning Routine',
-              cover: 'https://placehold.co/300x500/444/FFF?text=Routine',
-              stats: { views: 89500, likes: 7800, comments: 450, shares: 210 },
-              create_time: '2023-11-10T09:15:00Z'
-            },
-            {
-              id: 'v3',
-              title: 'Outfit Ideas for Winter',
-              cover: 'https://placehold.co/300x500/555/FFF?text=Fashion',
-              stats: { views: 112000, likes: 9200, comments: 620, shares: 180 },
-              create_time: '2023-11-05T17:45:00Z'
-            }
-          ]);
-        }
+        // Always use sample data when there's an error
+        setVideos([
+          {
+            id: 'v1',
+            title: 'TikTok Dance Challenge',
+            cover: 'https://placehold.co/300x500/333/FFF?text=Dance',
+            stats: { views: 158000, likes: 12300, comments: 840, shares: 320 },
+            create_time: '2023-11-15T14:32:00Z'
+          },
+          {
+            id: 'v2',
+            title: 'Morning Routine',
+            cover: 'https://placehold.co/300x500/444/FFF?text=Routine',
+            stats: { views: 89500, likes: 7800, comments: 450, shares: 210 },
+            create_time: '2023-11-10T09:15:00Z'
+          },
+          {
+            id: 'v3',
+            title: 'Outfit Ideas for Winter',
+            cover: 'https://placehold.co/300x500/555/FFF?text=Fashion',
+            stats: { views: 112000, likes: 9200, comments: 620, shares: 180 },
+            create_time: '2023-11-05T17:45:00Z'
+          }
+        ]);
       }
     }
     
@@ -128,17 +126,17 @@ export default function TopVideos({ authToken }) {
     );
   }
   
-  if (error && videos.length === 0) {
-    return (
-      <div className="bg-white overflow-hidden shadow rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Your Top Videos</h3>
-          <div className="mt-4 bg-red-50 p-4 rounded-md">
-            <p className="text-red-600">Error loading videos: {error}</p>
-          </div>
+  // Modified to always show error when present
+  const showError = () => {
+    if (error) {
+      return (
+        <div className="bg-red-50 p-4 rounded-md mb-4">
+          <p className="text-red-600">Error loading videos: {error}</p>
+          <p className="text-sm text-gray-600 mt-1">Showing sample data below</p>
         </div>
-      </div>
-    );
+      );
+    }
+    return null;
   }
   
   return (
@@ -148,6 +146,7 @@ export default function TopVideos({ authToken }) {
         <p className="mt-1 max-w-2xl text-sm text-gray-500">
           Your most recent TikTok videos
         </p>
+        {showError()}
       </div>
       
       <div className="px-4 py-5 sm:p-6">
