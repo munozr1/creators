@@ -6,8 +6,8 @@ import LegalPage from './components/LegalPage';
 import { QRCodeSVG } from 'qrcode.react'; // Import the named export
 
 // Backend configuration
-const BACKEND_URL = "http://104.237.133.248:3001";
-const WEBSOCKET_URL = 'ws://104.237.133.248:3001';
+const BACKEND_URL = "https://api.codemeet.dev";
+const WEBSOCKET_URL = 'wss://api.codemeet.dev';
 
 function App() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
