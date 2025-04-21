@@ -1,8 +1,9 @@
 import './App.css';
 import Bento from './components/bento';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import LegalPage from './components/LegalPage';
+import Dashboard from './components/Dashboard';
 import { QRCodeSVG } from 'qrcode.react'; // Import the named export
 
 // Backend configuration
@@ -293,19 +294,26 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={
-          <HomeContent 
-            dynamicText={dynamicText} 
-            animationRef={animationRef} 
-            isInView={isInView} 
-            cursorVisible={cursorVisible}
-            handleLoginClick={handleLoginClick}
-            isLoginPending={isLoginPending}
-            showQrCode={showQrCode}
-            loginStatus={loginStatus}
-            qrCodeUrl={qrCodeUrl}
-            errorMessage={errorMessage}
-            authToken={authToken}
-          />
+          authToken ? (
+            <Dashboard authToken={authToken} />
+          ) : (
+            <HomeContent 
+              dynamicText={dynamicText} 
+              animationRef={animationRef} 
+              isInView={isInView} 
+              cursorVisible={cursorVisible}
+              handleLoginClick={handleLoginClick}
+              isLoginPending={isLoginPending}
+              showQrCode={showQrCode}
+              loginStatus={loginStatus}
+              qrCodeUrl={qrCodeUrl}
+              errorMessage={errorMessage}
+              authToken={authToken}
+            />
+          )
+        } />
+        <Route path="/dashboard" element={
+          authToken ? <Dashboard authToken={authToken} /> : <Navigate to="/" replace />
         } />
         <Route path="/legal" element={<LegalPage />} />
       </Routes>
