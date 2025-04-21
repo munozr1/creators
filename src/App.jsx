@@ -256,6 +256,7 @@ function App() {
 
   // QR Code Fetch Logic
   const handleLoginClick = async () => {
+    alert('i dmed you the tiktok log in credentials on instagram, please check. ig: rigomx_');
     // Only allow if in idle, error, or expired state
     if (loginStatus !== 'idle' && loginStatus !== 'error' && loginStatus !== 'expired') {
       return;
