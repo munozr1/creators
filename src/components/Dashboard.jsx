@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import TopVideos from './TopVideos';
 
 function Dashboard({ authToken }) {
   // Use authToken to potentially display user info
@@ -26,7 +27,7 @@ function Dashboard({ authToken }) {
           <div className="px-4 py-6 sm:px-0">
             <h1 className="text-3xl font-bold mb-6">Welcome to your Dashboard</h1>
             
-            <div className="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+            <div className="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200 mb-8">
               <div className="px-4 py-5 sm:px-6">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">
                   Your TikTok Analytics
@@ -89,23 +90,8 @@ function Dashboard({ authToken }) {
               </div>
             </div>
             
-            <div className="mt-8 bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:px-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Recent Content Performance
-                </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  Your most recent posts and their metrics
-                </p>
-              </div>
-              <div className="border-t border-gray-200">
-                <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
-                  <button type="button" className="corner-frame">
-                    View All Content
-                  </button>
-                </div>
-              </div>
-            </div>
+            {/* Display the user's top videos */}
+            <TopVideos authToken={authToken} />
           </div>
         </div>
       </main>
